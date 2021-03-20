@@ -36,7 +36,8 @@ public class Main {
         }catch(Exception e){System.out.println(e);}
         
         
-        //ADATBÁZIS OLVASÁS
+        //ADATBÁZIS OLVASÁS KRISZTIÁN
+        //ASD
     try{
         Class.forName("com.mysql.jdbc.Driver");
         Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/8teremdb","root","root");
