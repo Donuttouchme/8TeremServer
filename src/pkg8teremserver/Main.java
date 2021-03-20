@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 package pkg8teremserver;
+import java.io.DataInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,23 +23,33 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
-        System.out.println("sajt");
         try{
-Class.forName("com.mysql.jdbc.Driver");
+        ServerSocket ss=new ServerSocket(6666);
+        Socket s=ss.accept();//establishes connection 
 
-Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/8teremdb","root","root");
-//here sonoo is the database name, root is the username and root is the password
-Statement stmt=con.createStatement();
+        DataInputStream dis=new DataInputStream(s.getInputStream());
 
-ResultSet rs=stmt.executeQuery("select * from test");
+        String	str=(String)dis.readUTF();
+        System.out.println("message= "+str);
+        ss.close();
 
-while(rs.next())
-System.out.println(rs.getInt(1));
+        }catch(Exception e){System.out.println(e);}
+        
+        
+        //ADATBÁZIS OLVASÁS
+    try{
+        Class.forName("com.mysql.jdbc.Driver");
+        Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/8teremdb","root","root");
+        //here sonoo is the database name, root is the username and root is the password
+        Statement stmt=con.createStatement();
+        ResultSet rs=stmt.executeQuery("select * from test");
 
-con.close();
+        while(rs.next())
+        System.out.println(rs.getInt(1));
 
-}catch(Exception e){ System.out.println(e);}
+        con.close();
+
+    }catch(Exception e){ System.out.println(e);}
     }
     
 }
