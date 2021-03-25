@@ -29,30 +29,67 @@ import java.util.logging.Logger;
  */
 public class Main {
 
+    static Connection con;
     public static void dostuff(Socket socket)throws IOException, ClassNotFoundException{
         InputStream inputStream = socket.getInputStream();
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
         Object c = objectInputStream.readObject();
-        System.out.println("class:");
-       System.out.println(c.getClass().getSimpleName()); // MILYEN CLASS EZ?
+        //System.out.println("class:");
+       //System.out.println(c.getClass().getSimpleName()); // MILYEN CLASS EZ?
         
         if (c.getClass().getSimpleName().equals("ArrayList")){
-            //csinal valamit...
+        //csinal valamit... FÜGGVÉNY IDE
         //List<Message> listOfMessages = (List<Message>) c;//objectInputStream.readObject();
         
         }
         if (c.getClass().getSimpleName().equals("Vasarlo")){
         //Vasarlo v = (Vasarlo) c;
-        //csinal valamit...
+        //csinal valamit... //FÜGGVÉNY IDE
         
     }
     }
+        //függvények adatbázisozáshoz:
+        boolean nameExists(){
+            try {
+                Statement stmt=con.createStatement();
+                ResultSet rs=stmt.executeQuery("select * from Guest where username like'" + "nev" + "'" );
+                if (!rs.wasNull()){
+                    return false;
+                }   
+            }
+            //main:
+            catch (SQLException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return true;
+    }
+        
+    
     public static void main(String[] args)throws IOException, ClassNotFoundException  {
-        int sajt =0;
+        boolean closeServer = false ;
         // SOCKET CSATLAKOZAS
         ServerSocket ss = new ServerSocket(7777);
         System.out.println("ServerSocket awaiting connections...");
         Socket socket = new Socket();
+                //ADATBÁZIS OLVASÁS:
+        
+    try{
+        Class.forName("com.mysql.jdbc.Driver");
+        con=DriverManager.getConnection("jdbc:mysql://localhost:3306/8teremdb","root","root");
+        //-----------------------------------------------------------------------------------
+        
+        
+        //Statement stmt=con.createStatement();
+        //ResultSet rs=stmt.executeQuery("select * from test");
+
+        //while(rs.next())
+        //System.out.println(rs.getInt(1));
+
+        if (closeServer==true){
+        con.close();
+        }
+    }catch(Exception e){ System.out.println(e);}
+    //SOCKET OLVASÁS:
         socket=ss.accept();
         do{
         try{
@@ -66,28 +103,13 @@ public class Main {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        }while(sajt!=1);
+        }while(closeServer!=true);
         //----------------------------------------------------------------------
+        //HA VÉGE:
         System.out.println("Closing sockets.");
         ss.close();
-        socket.close();
-        
-        
-        //ADATBÁZIS OLVASÁS
-    try{
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/8teremdb","root","root");
-        //-----------------------------------------------------------------------------------
-        //SQL PARANCSOKHOZ ITTEN MAJD:
-        Statement stmt=con.createStatement();
-        ResultSet rs=stmt.executeQuery("select * from test");
-
-        while(rs.next())
-        System.out.println(rs.getInt(1));
-
-        con.close();
-
-    }catch(Exception e){ System.out.println(e);}
+        socket.close();    
     }
+    
     
 }
