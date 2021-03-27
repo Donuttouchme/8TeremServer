@@ -1,9 +1,11 @@
+package pkg8terem;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pkg8teremserver;
+
 import java.io.DataInputStream;
 import java.io.EOFException;
 import static java.lang.Thread.sleep;
@@ -47,8 +49,36 @@ public class Main {
         //csinal valamit... //FÜGGVÉNY IDE
         
     }
+        
+        if (c.getClass().getSimpleName().equals("Restaurant")){
+        insertRestaurant(c);
     }
-        //függvények adatbázisozáshoz:
+        if (c.getClass().getSimpleName().equals("BusinessManager")){
+        insertManager((BusinessManager) c);
+    }
+    }
+    //függvények adatbázisozáshoz:
+    
+    static void insertManager(BusinessManager c){
+    try {
+            Statement stmt=con.createStatement();
+            stmt.executeQuery("INSERT INTO BusinessManager(username,passwd,firstName,lastName,corporateName,email,registrationDate)\n" +
+               "VALUES('"+c.getUsername()+"','"+c.getPassword()+"','"+c.getFirstName()+"','"+c.getLastName()+"','"+c.getCorporationName()+
+                    "','"+c.getEmail()+"','"+c.getRegistrationDate()+"')");
+        } catch (SQLException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    
+    }
+    static void insertRestaurant(Object c){
+        try {
+            Statement stmt=con.createStatement(); // managerID hogyan?
+            stmt.executeQuery("INSERT INTO Restaurant (RestaurantName, address, openHours)VALUES (C.getRestaurantname,C.getRestaurantaddress,C.getOpenHours)");
+        } catch (SQLException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                
+    }
         boolean nameExists(){
             try {
                 Statement stmt=con.createStatement();
