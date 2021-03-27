@@ -5,6 +5,7 @@
  */
 package pkg8terem;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Scanner;
 
@@ -12,7 +13,7 @@ import java.util.Scanner;
  *
  * @author polga
  */
-public class Restaurant {
+public class Restaurant implements Serializable{
     private int id, managerID;
     private String restaurantName, address, openHours, authorisationNumber;
     Menu menu;

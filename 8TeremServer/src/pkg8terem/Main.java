@@ -22,6 +22,9 @@ import java.io.*;
 import static java.lang.Thread.sleep;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,11 +37,13 @@ public class Main {
     static Connection con;
     public static void dostuff(Socket socket)throws IOException, ClassNotFoundException{
         InputStream inputStream = socket.getInputStream();
+        System.out.println("socket megkapta az inputot");
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+        System.out.println("ez jo?");
         Object c = objectInputStream.readObject();
         //System.out.println("class:");
        //System.out.println(c.getClass().getSimpleName()); // MILYEN CLASS EZ?
-        
+        System.out.println("objektum megkapva");
         if (c.getClass().getSimpleName().equals("ArrayList")){
         //csinal valamit... FÜGGVÉNY IDE
         //List<Message> listOfMessages = (List<Message>) c;//objectInputStream.readObject();
@@ -51,7 +56,7 @@ public class Main {
     }
         
         if (c.getClass().getSimpleName().equals("Restaurant")){
-        insertRestaurant(c);
+        //insertRestaurant(c);
     }
         if (c.getClass().getSimpleName().equals("BusinessManager")){
         insertManager((BusinessManager) c);
@@ -61,19 +66,37 @@ public class Main {
     
     static void insertManager(BusinessManager c){
     try {
-            Statement stmt=con.createStatement();
-            stmt.executeQuery("INSERT INTO BusinessManager(username,passwd,firstName,lastName,corporateName,email,registrationDate)\n" +
-               "VALUES('"+c.getUsername()+"','"+c.getPassword()+"','"+c.getFirstName()+"','"+c.getLastName()+"','"+c.getCorporationName()+
-                    "','"+c.getEmail()+"','"+c.getRegistrationDate()+"')");
+        System.out.println("insertálás:");
+        
+        PreparedStatement stmt = con.prepareStatement("INSERT INTO BusinessManager(username,passwd,firstName,lastName,corporateName,email,registrationDate)VALUES(?,?,?,?,?,?,?)");
+
+        stmt.setString(1, c.getUsername());
+        stmt.setString(2, c.getPassword());
+        stmt.setString(3, c.getFirstName());
+        stmt.setString(4, c.getLastName());
+        stmt.setString(5, c.getCorporationName());
+        stmt.setString(6, c.getEmail());
+        java.sql.Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+        stmt.setDate(7,date);
+
+stmt.executeUpdate();
+        
+        
+            //Statement stmt=con.createStatement();
+            //stmt.executeQuery("INSERT INTO BusinessManager(username,passwd,firstName,lastName,corporateName,email,registrationDate)\n" +
+              // "VALUES('"+c.getUsername()+"','"+c.getPassword()+"','"+c.getFirstName()+"','"+c.getLastName()+"','"+c.getCorporationName()+
+                //    "','"+c.getEmail()+"','"+c.getRegistrationDate()+"')");
         } catch (SQLException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-    
+    System.out.println("insert kész");
     }
-    static void insertRestaurant(Object c){
+    static void insertRestaurant(Restaurant c){
         try {
             Statement stmt=con.createStatement(); // managerID hogyan?
-            stmt.executeQuery("INSERT INTO Restaurant (RestaurantName, address, openHours)VALUES (C.getRestaurantname,C.getRestaurantaddress,C.getOpenHours)");
+            stmt.executeQuery("INSERT INTO Restaurant (RestaurantName, address,openHours)"+
+"VALUES (C.getRestaurantname,C.getRestaurantaddress,C.getOpenHours)");
+
         } catch (SQLException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }

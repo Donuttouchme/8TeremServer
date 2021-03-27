@@ -5,13 +5,14 @@
  */
 package pkg8terem;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  *
  * @author polga
  */
-public class Meal {
+public class Meal implements Serializable{
     private int id, cost;
     private String name;
     private List<String> allergens;

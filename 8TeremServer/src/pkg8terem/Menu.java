@@ -5,6 +5,7 @@
  */
 package pkg8terem;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Scanner;
 
@@ -12,7 +13,7 @@ import java.util.Scanner;
  *
  * @author polga
  */
-public class Menu {
+public class Menu implements Serializable{
     private List<Meal> meals;
     Scanner input = new Scanner(System.in);
     

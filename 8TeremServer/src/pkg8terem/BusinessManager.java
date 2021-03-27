@@ -5,17 +5,20 @@
  */
 package pkg8terem;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import pkg8terem.Restaurant;
+import pkg8terem.Users;
 /**
  *
  * @author polgar
  */
 
 
-public class BusinessManager implements Users {
+public class BusinessManager implements Users, Serializable{
 
     public String getUsername() {
         return username;
@@ -68,7 +71,10 @@ public class BusinessManager implements Users {
     public String getRegistrationDate() {
         return registrationDate;
     }
-
+    public BusinessManager()
+    {
+        
+    }
     //variables
     public void setRegistrationDate(String registrationDate) {
         this.registrationDate = registrationDate;
@@ -83,7 +89,7 @@ public class BusinessManager implements Users {
     private String registrationDate;
     private Restaurant managedRestaurant;
     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
-    Scanner input = new Scanner(System.in);
+    static Scanner input = new Scanner(System.in);
     
     //functions
     //
@@ -100,7 +106,7 @@ public class BusinessManager implements Users {
     }
     
     @Override
-    public BusinessManager Registration() {
+    public void Registration() {
     System.out.println("Enter email: ");                        //EMAIL
         email=input.nextLine();
     System.out.println("Enter username: ");                     //USERNAME
@@ -127,7 +133,7 @@ public class BusinessManager implements Users {
     System.out.println("Enter your Corporation's Name: ");      //CORPORATION NAME
        corporationName = input.nextLine();
     registrationDate=formatter.format(new Date(System.currentTimeMillis()));    //REGISTRATION DATE 
-        return new BusinessManager(username,password,firstName,lastName,corporationName,email,registrationDate);
+         new BusinessManager(username,password,firstName,lastName,corporationName,email,registrationDate);
     }
 
     @Override

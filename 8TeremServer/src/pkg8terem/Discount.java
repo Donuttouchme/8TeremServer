@@ -5,15 +5,12 @@
  */
 package pkg8terem;
 
-import javax.xml.bind.annotation.XmlElement;
+import java.io.Serializable;
 
 /**
  *
- * @author polgar
+ * @author polga
  */
-
-public interface Users
-{  
-    void Registration();
-    Users Login();
+public class Discount implements Serializable{
+    
 }
