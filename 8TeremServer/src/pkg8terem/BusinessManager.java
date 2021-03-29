@@ -57,11 +57,11 @@ public class BusinessManager implements Users, Serializable{
     }
     
     @Override
-    public BusinessManager Registration() throws IOException {
-       
-        System.out.println("Enter email: ");                        //EMAIL
+    public BusinessManager Registration(String __username) throws IOException {
+        username=__username;
+        System.out.println("Email:");
             email=input.nextLine();
-        System.out.println("Enter password: ");                      //PASSWORD
+            System.out.println("password");
             password = input.nextLine();
         System.out.println("Enter password again: ");   
             passwordCheck = input.nextLine();
@@ -116,7 +116,7 @@ public class BusinessManager implements Users, Serializable{
             restaurantName = input.nextLine();
         System.out.println("Enter your restaurant's address: ");
             address = input.nextLine();
-        System.out.println("Enter your restaurant's hopen hours: ");
+        System.out.println("Enter your restaurant's open hours: ");
             openHours = input.nextLine();
         System.out.println("Enter your restaurant's authorisation number: ");
             authorisationNumber = input.nextLine();

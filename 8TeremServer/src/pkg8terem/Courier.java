@@ -37,7 +37,7 @@ public class Courier implements Users{
     }
     
     @Override
-    public Courier Registration() {
+    public Courier Registration(String __username) {
 //        System.out.println("Enter email: ");                        //EMAIL
 //        email=input.nextLine();
 //    System.out.println("Enter username: ");                     //USERNAME

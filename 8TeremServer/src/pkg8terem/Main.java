@@ -48,7 +48,7 @@ public class Main {
  
         Object c = objectInputStream.readObject();
         System.out.println("objektum megkapva");
-        
+        System.out.println(c.getClass().getSimpleName());
         
         if (c.getClass().getSimpleName().equals("Pair")){
         Pair pairObj = (Pair) c;
@@ -91,6 +91,7 @@ public class Main {
         // -----------------INSERTÁLÁS IFEK ÉS GET-IDK!
             if(pairObj.getKey().getClass().getSimpleName().equals("BusinessManager")){
                 if(keyvalue==1){
+                   
                 insertManager((BusinessManager)pairObj.getKey());
                 }
                 if (keyvalue==0){

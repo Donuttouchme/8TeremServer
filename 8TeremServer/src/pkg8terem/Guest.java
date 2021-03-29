@@ -95,9 +95,9 @@ public class Guest implements Users, Serializable {
     
     
     @Override
-    public Guest Registration() throws IOException {
+    public Guest Registration(String __username) throws IOException {
         System.out.println("Enter username: ");
-         username = input.nextLine();
+         username = __username;
     //TO-DO check with the server
     //
     //

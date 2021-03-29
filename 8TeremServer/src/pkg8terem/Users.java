@@ -16,6 +16,6 @@ import javax.xml.bind.annotation.XmlElement;
 
 public interface Users
 {  
-    Users Registration()throws IOException;
+    Users Registration(String username)throws IOException;
     Users Login();
 }
