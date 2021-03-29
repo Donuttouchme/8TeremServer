@@ -40,12 +40,11 @@ import javafx.util.Pair;
 //7 courier
 
 public class Main {
-
     static Connection con;
-    public static void dostuff(Socket socket)throws IOException, ClassNotFoundException{
-        InputStream inputStream = socket.getInputStream();
-        System.out.println("socket megkapta az inputot");
-        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+    public static void dostuff(ObjectInputStream objectInputStream,ObjectOutputStream objectOutputStream)throws IOException, ClassNotFoundException{
+
+        
+        
  
         Object c = objectInputStream.readObject();
         System.out.println("objektum megkapva");
@@ -53,27 +52,28 @@ public class Main {
         
         if (c.getClass().getSimpleName().equals("Pair")){
         Pair pairObj = (Pair) c;
-        
+        int keyvalue = (int)pairObj.getValue();
         // -------------- létezik-e a név: ha létezik true
-        int keyvalue = (int)pairObj.getKey();
+            
+        
             if (pairObj.getKey().getClass().getSimpleName().equals("String")){
                 if (keyvalue==5){
                 boolean exists = nameExists((String) pairObj.getKey(),"BusinessManager");
-                 OutputStream outputStream = socket.getOutputStream();
-         ObjectOutputStream objectOutputStream= new ObjectOutputStream(outputStream);
-         objectOutputStream.writeObject(exists);
+                    System.out.println("kuldes elott: ");
+                    
+            objectOutputStream.writeBoolean(exists);
+            objectOutputStream.flush();
+            objectOutputStream.reset();
                 }
                 if (keyvalue==6){
                 boolean exists=nameExists((String) pairObj.getKey(),"Guest");
-                 OutputStream outputStream = socket.getOutputStream();
-         ObjectOutputStream objectOutputStream= new ObjectOutputStream(outputStream);
-         objectOutputStream.writeObject(exists);
+                 
+         objectOutputStream.writeBoolean(exists);
                 }
                 if (keyvalue==7){
                 boolean exists =nameExists((String) pairObj.getKey(),"Courier");
-                 OutputStream outputStream = socket.getOutputStream();
-         ObjectOutputStream objectOutputStream= new ObjectOutputStream(outputStream);
-         objectOutputStream.writeObject(exists);
+                
+         objectOutputStream.writeBoolean(exists);
                 }
             }
         //---------------------CHECKLOGIN IFEK
@@ -95,8 +95,7 @@ public class Main {
                 }
                 if (keyvalue==0){
          int id = getManagerID((BusinessManager) pairObj.getKey());
-         OutputStream outputStream = socket.getOutputStream();
-         ObjectOutputStream objectOutputStream= new ObjectOutputStream(outputStream);
+         
          objectOutputStream.writeObject(id);
                 }
             }
@@ -106,8 +105,7 @@ public class Main {
                 }
                 if(keyvalue==0){
          int id = getGuestID((Guest) pairObj.getKey());
-         OutputStream outputStream = socket.getOutputStream();
-         ObjectOutputStream objectOutputStream= new ObjectOutputStream(outputStream);
+        
          objectOutputStream.writeObject(id);
                 }
             }
@@ -117,8 +115,7 @@ public class Main {
                 }
                 if(keyvalue==0){
          int id = getRestaurantID((Restaurant) pairObj.getKey());
-         OutputStream outputStream = socket.getOutputStream();
-         ObjectOutputStream objectOutputStream= new ObjectOutputStream(outputStream);
+        
          objectOutputStream.writeObject(id);
                 }
                 }
@@ -127,8 +124,7 @@ public class Main {
                 //insert((Courier)pairObj.getKey());
                  //if(keyvalue==0){
          //int id = getRestaurantID((pairObj.getKey()) c);
-         //OutputStream outputStream = socket.getOutputStream();
-         //ObjectOutputStream objectOutputStream= new ObjectOutputStream(outputStream);
+   
          //objectOutputStream.writeObject(id);
                 //}
         //}
@@ -217,12 +213,14 @@ stmt.executeUpdate();
         static boolean nameExists(String nev,String tipus){
             try {
                 Statement stmt=con.createStatement();
-                ResultSet rs=stmt.executeQuery("select username from"+ tipus +"where username like'" + nev + "'" );
-                if (!rs.wasNull()){
+                System.out.println("select username from "+ tipus +" where username like '" + nev + "'");
+                ResultSet rs=stmt.executeQuery("select username from " + tipus +" where username like '" + nev + "'" );
+                if (rs.next()){
                     return true;
                 }   
             }
             catch (SQLException ex) {
+                //return false;
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
             return false;
@@ -300,10 +298,15 @@ stmt.executeUpdate();
     }catch(Exception e){ System.out.println(e);}
     //SOCKET OLVASÁS:
         socket=ss.accept();
+                InputStream inputStream = socket.getInputStream();
+        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+        
+        OutputStream outputStream = socket.getOutputStream();
+        ObjectOutputStream objectOutputStream= new ObjectOutputStream(outputStream);
         do{
         try{
-        
-        dostuff(socket);
+
+        dostuff(objectInputStream,objectOutputStream);
         }catch(EOFException e){
         System.out.println("No new message just yet");
             try {
