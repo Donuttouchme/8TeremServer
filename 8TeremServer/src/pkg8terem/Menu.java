@@ -15,7 +15,7 @@ import java.util.Scanner;
  */
 public class Menu implements Serializable{
     private List<Meal> meals;
-    Scanner input = new Scanner(System.in);
+    static Scanner input = new Scanner(System.in);
     
     public Menu(List<Meal> _meals)
     {
@@ -26,30 +26,45 @@ public class Menu implements Serializable{
         return meals;
     }
      public void addMealToMenu() {
-        System.out.println("How many meals do you want to add: ");
-        int numOfDishes = input.nextInt();
-        for(int i=0;i<numOfDishes;i++)
+        System.out.println("Please enter the meals, when you are done, enter 'end' ");
+         System.out.println("Enter the first meal's name: ");
+        String dishName = input.nextLine();
+        while (!dishName.equals("end")) 
         {
-            System.out.println("Plese give the " +i+". meal's name you want to add: ");
-                String dishName =input.nextLine();
+            System.out.println("Please enter the price of the meal: ");
                 int mealCost =input.nextInt();
-            System.out.println("How many allergens do you want to add?");
-                int numOfAllergens = input.nextInt();
-            List<String> mealAllergens=null;
-            for(int j=0;j<numOfAllergens;j++)
+            System.out.println("Please enter the ingredients, if you are done enter 'end'");
+                String inIngredients = input.nextLine();
+                List<String>mealIngredients=null;
+            while(!inIngredients.equals("end"))
             {
-                System.out.println("Enter the "+(i+1)+". allergene: ");
-                    mealAllergens.add(input.nextLine());
-                    
+                mealIngredients.add(inIngredients);
+                inIngredients=input.nextLine();
+                
             }
-            meals.add(new Meal(meals.size()+1,dishName,mealCost,mealAllergens));
+            System.out.println("Please enter the allergens, if you are done enter 'end'");
+                String inAllergens = input.nextLine();
+            List<String> mealAllergens=null;
+             while(!inAllergens.equals("end"))
+            {
+                mealAllergens.add(inIngredients);
+                inIngredients=input.nextLine();
+                
+            }
+            meals.add(new Meal(meals.size()+1,dishName,mealCost,mealIngredients,mealAllergens));
+            System.out.println("Please enter the next meal's name: ");
+            dishName = input.nextLine();
         }
+         System.out.println("You've successfully added meals to your menu! ");
     }
      public void listMenu()
     {
-        for(int i=0;i<meals.size();i++)
+        for(int i=0;i<meals.size();i++){
+        System.out.println("The cost of "+meals.get(i).getName()+" is: "+meals.get(i).getCost()+ "$ and it contains the following allergens: ");
+        for(int j=0;j<meals.get(i).getAllergens().size();j++)
         {
-            System.out.println(meals.get(i));
+            System.out.println(meals.get(i).getAllergens().get(j));
         }
     }
-}
+    }
+} 
