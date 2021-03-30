@@ -19,7 +19,6 @@ public class Restaurant implements Serializable{
     private String restaurantName = null;
     private String restaurantAddress = null;
     private String openHours = null;
-    private String authorisationNumber = null;
     
     Menu menu;
     static Scanner input = new Scanner(System.in);
@@ -29,13 +28,12 @@ public class Restaurant implements Serializable{
         
     }
     
-    public Restaurant(int _restaurantID, String _restaurantName, String _restaurantAddress, String _openHours, String _authorisationNumber, int _managerID)
+    public Restaurant(int _restaurantID, String _restaurantName, String _restaurantAddress, String _openHours, int _managerID)
     {
         this.restaurantID = _restaurantID;
         this.restaurantName = _restaurantName;
         this.restaurantAddress = _restaurantAddress;
         this.openHours = _openHours;
-        this.authorisationNumber = _authorisationNumber;
         this.managerID = _managerID;
     }
     
@@ -81,13 +79,5 @@ public class Restaurant implements Serializable{
 
     public void setOpenHours(String openHours) {
         this.openHours = openHours;
-    }
-
-    public String getAuthorisationNumber() {
-        return authorisationNumber;
-    }
-
-    public void setAuthorisationNumber(String authorisationNumber) {
-        this.authorisationNumber = authorisationNumber;
-    }    
+    } 
 }

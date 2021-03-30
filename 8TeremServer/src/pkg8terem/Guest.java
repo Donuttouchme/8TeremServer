@@ -26,7 +26,7 @@ public class Guest implements Users, Serializable {
     {  
     }
     
-    public Guest(String _username,String _password, String _firstName,String _lastName,String _guestAddress, String _phoneNumber, String _registrationDate)
+    public Guest(String _username,String _password, String _firstName,String _lastName,String _guestAddress, String _phoneNumber)
     {
         this.username = _username;
         this.password = _password;
@@ -34,7 +34,6 @@ public class Guest implements Users, Serializable {
         this.lastName = _lastName;
         this.guestAddress = _guestAddress;
         this.phoneNumber = _phoneNumber;
-        this.registrationDate = _registrationDate;
     }
       
     public String getUsername() {
@@ -122,18 +121,18 @@ public class Guest implements Users, Serializable {
         phoneNumber = input.nextLine();               
     registrationDate = formatter.format(new Date(System.currentTimeMillis()));  //REGISTRATION DATE
     
-     return new Guest(username,password,firstName,lastName,guestAddress,phoneNumber,registrationDate);
+     return new Guest(username,password,firstName,lastName,guestAddress,phoneNumber);
     }
     
 
 
     @Override
     public Guest Login() {
-        System.out.println("Enter username: ");
-        username = input.nextLine();
-        System.out.println("Enter password: ");
-        password = input.nextLine();
-        return new Guest("user","password","firstname","lastname", "666 Hell shit street 666", "06206666666","2021-03-20 'at' 18:00:00 z");
+//        System.out.println("Enter username: ");
+//        username = input.nextLine();
+//        System.out.println("Enter password: ");
+//        password = input.nextLine();
+        return new Guest("user","password","firstname","lastname", "666 Hell shit street 666", "06206666666");
     }
     
     public void makeOrder() {
