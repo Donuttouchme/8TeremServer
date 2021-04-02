@@ -33,6 +33,7 @@ import javafx.util.Pair;
 //6 guest
 //7 courier
 //8 lekérdezés: 
+//9. 
 public class Main implements Serializable{
     static Connection con;
     static ObjectOutputStream objectOutputStream = null;
@@ -40,6 +41,7 @@ public class Main implements Serializable{
     static InputStream inputStream = null;
     static OutputStream outputStream;
     private static final long serialVersionUID = 6529685098267757691L;
+    static Pair<Object,Integer>datas;
     
     
     public static void dostuff(ObjectInputStream objectInputStream,ObjectOutputStream objectOutputStream)throws IOException, ClassNotFoundException{
@@ -75,10 +77,28 @@ public class Main implements Serializable{
             }
         //---------------------CHECKLOGIN IFEK
             if (pairObj.getKey().getClass().getSimpleName().equals("Pair")){
+                
+                if(keyvalue==1){
+                insertMeal((Pair)pairObj.getKey());
+                }
+                
                 if(keyvalue==2){
                     
                     BusinessManager bs = CheckLoginManager((Pair)pairObj.getKey());
                     System.out.println("kuldes elotttttt");
+                    
+//                    for (int i=0; i<4;i++){
+//                        
+//                        for (int j=0; j<bs.getManagedRestaurant().getMenu().get(i).getMeals().size();j++){
+//                            if (bs.getManagedRestaurant().getMenu().get(i).getMeals().get(j)!=null){
+//                            System.out.println(bs.getManagedRestaurant().getMenu().get(i).getMeals().get(j).getName());
+//                            System.out.println(bs.getManagedRestaurant().getMenu().get(i).getMeals().get(j).getMenuID());
+//                        }
+//                    }
+//                    }
+                    
+                    
+                    
                     System.out.println(bs.getUsername()+bs.getPassword());
                     objectOutputStream.writeObject(bs);
                     objectOutputStream.flush();
@@ -86,8 +106,25 @@ public class Main implements Serializable{
                     System.out.println("kuldes utan");
                 }
                 if(keyvalue==3){
-                    boolean match = CheckLoginGuest((Pair)pairObj.getKey());
-                    objectOutputStream.writeBoolean(match);
+                    Guest g = CheckLoginGuest((Pair)pairObj.getKey());
+                    //objectOutputStream.writeObject(g);
+                    //objectOutputStream.flush();
+                    //objectOutputStream.reset();
+//                    try {
+//                        sleep(600);
+//                    } catch (InterruptedException ex) {
+//                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+                    List<Restaurant> l = RestaurantQuery();
+                    List<Menu> temp;
+                    for (int i=0; i<l.size();i++){    
+                    temp=MenuQuery(l.get(i));
+                    l.get(i).setMenu(temp);
+                    }
+                    
+                    System.out.println(l.get(0).getMenu().size());
+                    Pair<Guest,List<Restaurant>> p = new Pair<>(g,l);
+                    objectOutputStream.writeObject(p);
                     objectOutputStream.flush();
                     objectOutputStream.reset();
                 }
@@ -134,8 +171,26 @@ public class Main implements Serializable{
                     int id = getRestaurantID((pairObj.getKey()) c);
                     objectOutputStream.writeObject(id);
                 }
-        }
+                }
                         */
+                //if(pairObj.getKey().getClass().getSimpleName().equals("Menu")){
+                //if(keyvalue==1){
+                //    insertMenu((Menu)pairObj.getKey());
+                //}
+                //if(keyvalue==0){
+                  //  int id = getRestaurantID((Restaurant) pairObj.getKey());
+                   // objectOutputStream.writeObject(id);
+                //}
+                //}
+                if(pairObj.getKey().getClass().getSimpleName().equals("Meal")){
+                if(keyvalue==1){
+                    //insertMeal((Meal)pairObj.getKey());
+                }
+                //if(keyvalue==0){
+                  //  int id = getRestaurantID((Restaurant) pairObj.getKey());
+                   // objectOutputStream.writeObject(id);
+                //}
+                }
         }
     }
     
@@ -157,9 +212,13 @@ public class Main implements Serializable{
                             rs2=stmt2.executeQuery("select max(restaurantID) from Restaurant");
                             rs2.next();
                         businessManager.setManagedRestaurant(new Restaurant(rs2.getInt(1)+1," "," "," ",rs.getInt(1)));
+                        
                         }
                         else{
                         businessManager.setManagedRestaurant(new Restaurant(rs.getInt(9),rs.getString(10),rs.getString(11),rs.getString(12),rs.getInt(13)));
+                            System.out.println("Étterme lekérdezve:");
+                        System.out.println(businessManager.getManagedRestaurant().getRestaurantID()+""+businessManager.getManagedRestaurant().getRestaurantName()+" "+businessManager.getManagedRestaurant().getRestaurantAddress()+" "+businessManager.getManagedRestaurant().getOpenHours()+" "+businessManager.getManagedRestaurant().getManagerID());
+                        businessManager.getManagedRestaurant().setMenu(MenuQuery(businessManager.getManagedRestaurant()));
                         }
                         businessManager.setManagerID(rs.getInt(1));  
                     }
@@ -170,18 +229,20 @@ public class Main implements Serializable{
             return businessManager;
     }
     
-    static boolean CheckLoginGuest(Pair p){
+    static Guest CheckLoginGuest(Pair p){
+        Guest g=null;
     try {
         Statement stmt=con.createStatement();
-        ResultSet rs=stmt.executeQuery("select username from Guest where username like '" + p.getKey() + "' AND passwd like '"+p.getValue() + "'" );
+        ResultSet rs=stmt.executeQuery("select * from Guest where username like '" + p.getKey() + "' AND passwd like '"+p.getValue() + "'" );
         if (rs.next()){
-            return true;
+            g = new Guest(rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6),rs.getString(7));
+            g.setGuestID(rs.getInt(1));
             }   
         }
     catch (SQLException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-            return false;
+            return g;
     }
     
     /*static boolean CheckLoginCourier(Pair p){
@@ -219,7 +280,7 @@ public class Main implements Serializable{
         } catch (SQLException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-    System.out.println("insert kész");
+    System.out.println("manager insert kész");
     }
     
     static void insertGuest(Guest c){
@@ -244,6 +305,12 @@ public class Main implements Serializable{
     
     
     static void insertRestaurant(Restaurant c){
+        try {
+            Statement stmt=con.createStatement();
+        } catch (SQLException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     try {
         PreparedStatement stmt = con.prepareStatement("INSERT INTO Restaurant(RestaurantName,address,openHours,managerID)VALUES(?,?,?,?)");
         stmt.setString(1, c.getRestaurantName());
@@ -252,70 +319,111 @@ public class Main implements Serializable{
         stmt.setInt(4,c.getManagerID());
         
         stmt.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }           
-    }
-    /*
-    static void insertMenu(Menu c){
-    try {
-        PreparedStatement stmt = con.prepareStatement("INSERT INTO Menu(RestaurantID)VALUES(?)");
-        stmt.setInt(1, c.getRestaurantID());
-        stmt.executeUpdate();
+        
+            //ResultSet rs2=stmt.executeQuery("select count(restaurantID) from Restaurant");
+            //rs2.next();
+            //System.out.println(rs2.getInt(1));
+            System.out.println("be lett insertálva az étterem: "+c.getManagerID()+" "+c.getRestaurantName()+" "+ c.getRestaurantAddress()+" "+ c.getOpenHours()+" "+ c.getManagerID());
+        insertMenu(c.getRestaurantID());
+        System.out.println("Menü beinzertálása megtörtént");
+        //insertMenu(rs2.getInt(1));
         } catch (SQLException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }           
     }
     
-    static void insertMeal(Meal c){
+    static void insertMenu(int RestaurantID){
     try {
-        PreparedStatement stmt = con.prepareStatement("INSERT INTO Food(name,ingredients,allergenes,price,menuID)VALUES(?,?,?,?,?)");
-        stmt.setString(1, c.getMealName());
-        stmt.setString(2, c.getIngredients());
-        stmt.setString(3, c.getAllergenes());
-        stmt.setInt(4,c.getprice());
-        stmt.setInt(5,c.getMenuID());
+        PreparedStatement stmt = con.prepareStatement("INSERT INTO Menu(restaurantID,categoryID)VALUES(?,?),(?,?),(?,?),(?,?)");
+        stmt.setInt(1,RestaurantID);
+        stmt.setInt(3,RestaurantID);
+        stmt.setInt(5,RestaurantID);
+        stmt.setInt(7,RestaurantID);
+        stmt.setInt(2,1); //előétel
+        stmt.setInt(4,2); //főétel
+        stmt.setInt(6,3); //desszert
+        stmt.setInt(8,4); //italok
         stmt.executeUpdate();
+        System.out.println("Menü kategóriák beinzertálása megtörtént");
         } catch (SQLException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }           
     }
-    */
+    
+    static void insertMeal(Pair p){
+    try {
+        Meal c = (Meal)p.getKey();
+        int id = (int) p.getValue();
+        System.out.println("Kaja beinzertálás előtt");
+        PreparedStatement stmt = con.prepareStatement("INSERT INTO Food(name,ingredients,allergenes,price,menuID)VALUES(?,?,?,?,?)");
+        stmt.setString(1, c.getName());
+        stmt.setString(2, c.getIngredients());
+        stmt.setString(3, c.getAllergens());
+        stmt.setInt(4,c.getCost());
+        stmt.setInt(5,c.getMenuID());
+        stmt.executeUpdate();
+        System.out.println("Kaja beinzertálása megtörtént");
+        } catch (SQLException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }           
+    }
+    
     //-----------------------------Queries
-    static ResultSet RestaurantQuery(){
+    static List<Restaurant> RestaurantQuery(){
         ResultSet rs=null;
+        List<Restaurant> list = new ArrayList<Restaurant>();
         try {
             Statement stmt=con.createStatement();
             rs=stmt.executeQuery("select * from Restaurant");
+            while(rs.next()){
+                list.add(new Restaurant(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getInt(5)));
+                
+}
         } catch (SQLException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return rs;
+        return list;
     }
     
-    static ResultSet MenuQuery(Restaurant r){
+    static List<Menu> MenuQuery(Restaurant r){
         ResultSet rs=null;
+        List<Menu> menulista=new ArrayList<Menu>();
         int id = r.getRestaurantId();
         try {
             Statement stmt=con.createStatement();
             rs=stmt.executeQuery("select * from Menu where restaurantID = "+id);
+            while (rs.next()){
+                System.out.println("menük kiiratása: ");
+                System.out.println(rs.getInt(3)-1+" "+rs.getInt(2)+" "+rs.getInt(1)+" "+r.getRestaurantID());
+                menulista.add(new Menu(rs.getInt(1),rs.getInt(3)-1,rs.getInt(2),FoodQuery(rs.getInt(3),r.getRestaurantID())));
+                
+            }
         } catch (SQLException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return rs;
+        return menulista;
     }
-    /*
-    static ResultSet FoodQuery(Menu r){
+    
+    static List<Meal> FoodQuery(int id,int resid){
         ResultSet rs=null;
-        int id = r.getMenuId();
+        List<Meal> list = new ArrayList<Meal>();
+        
         try {
             Statement stmt=con.createStatement();
-            rs=stmt.executeQuery("select * from Food where menuID = "+id);
+            rs=stmt.executeQuery("select * from Food join Menu on Menu.menuID=Food.menuID where Menu.categoryID = "+id+" AND Menu.restaurantID="+resid);
+            
+            while(rs.next()){
+            System.out.println("kaják kiiratása: ");
+            System.out.println(rs.getString(2)+" "+rs.getInt(5)+" "+rs.getString(3)+" "+rs.getString(4)+" "+rs.getInt(6));
+            list.add(new Meal(rs.getString(2),rs.getInt(5),rs.getString(3),rs.getString(4),rs.getInt(9),rs.getInt(6)));
+            
+            }
         } catch (SQLException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return rs;
+        return list;
     }
+    /*
     static ResultSet DiscountQuery(Food r){
         ResultSet rs=null;
         int id = r.getFoodId();

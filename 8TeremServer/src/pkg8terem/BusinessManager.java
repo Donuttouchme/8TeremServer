@@ -16,7 +16,7 @@ import java.util.Scanner;
 import javafx.util.Pair;
 import static pkg8terem.Main.objectOutputStream;
 import static pkg8terem.Main.objectInputStream;
-import pkg8terem.Restaurant;
+import pkg8terem.Restaurant.*;
 import pkg8terem.Users;
 /**
  *
@@ -91,16 +91,7 @@ public class BusinessManager implements Users, Serializable{
             username = input.nextLine();
         System.out.println("Enter password: ");
             password = input.nextLine();
-            datas = new Pair<>(new Pair<>(username,password), 0);
-//            if()
-//            {
-//            correct = true;
-//            }
-//            else
-//            {
-//                System.out.println("Incorrect password or username, please enter them again: ");
-//            }
-//            
+            datas = new Pair<>(new Pair<>(username,password), 0);        
         }
             
             return new BusinessManager();
@@ -112,17 +103,9 @@ public class BusinessManager implements Users, Serializable{
             m.objectOutputStream.writeObject(datas);
     }
     
-        void addMealToMenu() throws IOException
+        void addMealToMenu(String mealName, int mealPrice,String mealIngredients,String mealAllergens, int category) throws IOException
     {
-        managedRestaurant.menu.addMealToMenu();
-        datas = new Pair<>(managedRestaurant.getMenu(),1);
-        try {
-            m.objectOutputStream.writeObject(datas); 
-        } catch (Exception e) {
-            System.out.println("Something happened, so we couldn't add your meals to your menu, please try again later! ");
-        }
-        System.out.println("You've successfully added meals to your menu! ");
-
+        managedRestaurant.addMealToSpecifiedMenu(category, new Meal(mealName,mealPrice,mealIngredients,mealAllergens, category,managedRestaurant.getMenu().get(category).getId()));
     }
     
     void checkOrders()

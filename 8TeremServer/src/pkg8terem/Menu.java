@@ -5,68 +5,88 @@
  */
 package pkg8terem;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import javafx.util.Pair;
+import static pkg8terem.Main.*;
 
 /**
  *
  * @author polga
  */
 public class Menu implements Serializable{
-    private List<Meal> meals;
+    private int id;
+    private int restaurantID;
+    private int category;
+    private List<Meal> meals = new ArrayList<Meal>();
     static Scanner input = new Scanner(System.in);
     
-    public Menu(List<Meal> _meals)
+    public Menu(int _id, int _categoryID, int _restaurantID,List<Meal> _meals)
     {
+        this.id=_id;
+        this.category=_categoryID;
+        this.restaurantID = _restaurantID;
         this.meals=_meals;
     }
+        public Menu(int _categoryID, int _restaurantID,List<Meal> _meals)
+    {
 
-
+        this.category=_categoryID;
+        this.restaurantID = _restaurantID;
+        this.meals=_meals;
+    }
+    
+    public Menu()
+    {
+    }
+    
     List<Meal> getMenu()
     {
         return meals;
     }
-     public void addMealToMenu() {
-        System.out.println("Please enter the meals, when you are done, enter 'end' ");
-         System.out.println("Enter the first meal's name: ");
-        String dishName = input.nextLine();
-        while (!dishName.equals("end")) 
-        {
-            System.out.println("Please enter the price of the meal: ");
-                int mealCost =input.nextInt();
-            System.out.println("Please enter the ingredients, if you are done enter 'end'");
-                String inIngredients = input.nextLine();
-                List<String>mealIngredients=null;
-            while(!inIngredients.equals("end"))
-            {
-                mealIngredients.add(inIngredients);
-                inIngredients=input.nextLine();
-                
-            }
-            System.out.println("Please enter the allergens, if you are done enter 'end'");
-                String inAllergens = input.nextLine();
-            List<String> mealAllergens=null;
-             while(!inAllergens.equals("end"))
-            {
-                mealAllergens.add(inIngredients);
-                inIngredients=input.nextLine();
-                
-            }
-            meals.add(new Meal(meals.size()+1,dishName,mealCost,mealIngredients,mealAllergens));
-            System.out.println("Please enter the next meal's name: ");
-            dishName = input.nextLine();
+     public void addMealToMenu(Meal meal) throws IOException {
+            datas = new Pair<>(new Pair<>(meal,0),1);
+            meals.add(meal);
+            objectOutputStream.writeObject(datas);
         }
-         System.out.println("You've successfully added meals to your menu! ");
-    }
+     
      public void listMenu()
     {
-        for(int i=0;i<meals.size();i++){
-        System.out.println("The cost of "+meals.get(i).getName()+" is: "+meals.get(i).getCost()+ "$ and it contains the following allergens: ");
-        for(int j=0;j<meals.get(i).getAllergens().size();j++)
-        {
-            System.out.println(meals.get(i).getAllergens().get(j));
-        }
+        
     }
+     
+     
+    public int getRestaurantID() {
+        return restaurantID;
+    }
+
+    public void setRestaurantID(int restaurantID) {
+        this.restaurantID = restaurantID;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public List<Meal> getMeals() {
+        return meals;
+    }
+
+    public void setMeals(List<Meal> meals) {
+        this.meals = meals;
+    }
+        public int getCategory() {
+        return category;
+    }
+
+    public void setCategory(int category) {
+        this.category = category;
     }
 } 

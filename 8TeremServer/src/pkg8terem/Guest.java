@@ -7,9 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import static pkg8terem.Main.*;
 
 
 public class Guest implements Users, Serializable {
+    private int guestID = 0;
     private String username = null;
     private String password = null;
     private String passwordCheck = null;
@@ -18,7 +20,7 @@ public class Guest implements Users, Serializable {
     private String guestAddress = null;
     private String phoneNumber = null;
     private String registrationDate = null;
-
+    
     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
     static Scanner input = new Scanner(System.in);
 
@@ -92,6 +94,13 @@ public class Guest implements Users, Serializable {
         this.registrationDate = _registrationDate;
     }
     
+    public int getGuestID() {
+        return guestID;
+    }
+
+    public void setGuestID(int guestID) {
+        this.guestID = guestID;
+    }
     
     @Override
     public Guest Registration(String __username) throws IOException {
