@@ -5,67 +5,85 @@
  */
 package pkg8terem;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.Scanner;
+import javafx.util.Pair;
+import pkg8terem.Main.*;
 
 /**
  *
  * @author polga
  */
-public class Courier implements Users{
+public class Courier implements Users, Serializable{
 
     private String username = null;
     private String password = null;
     private String firstName = null;
     private String lastName = null;
     private String phoneNumber = null;
+    private String workingHours = null;
     private int salary = 0;
-    static Scanner input = new Scanner(System.in);
+    private int courierID;
     
     public Courier()
     {
         
     }
     
-    public Courier(String _username, String _password, String _firstname, String _lastname, String _phonenumber, int _salary)
+    public Courier(int _courierID,String _username,String _password,String _firstname,String _lastname,String _phoneNumber,String _workingHours, int _salary)
+    {
+        this.courierID=_courierID;
+        this.username = _username;
+        this.password= _password;
+        this.firstName = _firstname;
+        this.lastName = _lastname;
+        this.phoneNumber = _phoneNumber;
+        this.workingHours = _workingHours;
+        this.salary=_salary;
+    }
+    
+    public Courier(String _username, String _password, String _firstname, String _lastname, String _phonenumber, String _workingHours)
     {
         this.username = _username;
         this.password= _password;
         this.firstName = _firstname;
         this.lastName = _lastname;
         this.phoneNumber = _phonenumber;
-        this.salary = _salary;
+        this.workingHours = _workingHours;
+        String[] parts = _workingHours.split("-");
+        String part1 = parts[0]; 
+        String part2 = parts[1]; 
+        this.salary = 1100*(Integer.parseInt(part2)-Integer.parseInt(part1));
+    }
+    
+    public void alterAvailability(String _phoneNumber, String _hours) throws IOException
+    {
+        this.phoneNumber=_phoneNumber;
+        this.workingHours=_hours;
+        update(new Courier(courierID,username,password,firstName,lastName,phoneNumber,workingHours,salary));
+    }
+    
+    public void update(Courier c) throws IOException
+    {
+        Main.datas = new Pair<>(c,2);
+        Main.objectOutputStream.writeObject(Main.datas);
+        Main.objectOutputStream.flush();
+        Main.objectOutputStream.reset();
+        
+    }
+    
+    public void orderDelivered(Order order) throws IOException
+    {
+        order.setOrderStatus(3);
+        Main.datas = new Pair<>(order,1);
+        Main.objectOutputStream.writeObject(Main.datas);
+        Main.objectOutputStream.flush();
+        Main.objectOutputStream.reset();
     }
     
     @Override
-    public Courier Registration(String __username) {
-//        System.out.println("Enter email: ");                        //EMAIL
-//        email=input.nextLine();
-//    System.out.println("Enter username: ");                     //USERNAME
-//        username = input.nextLine();
-//    //TO-DO check with the server
-//    //
-//    //
-//    
-//    System.out.println("Enter password: ");                      //PASSWORD
-//        password = input.nextLine();
-//    System.out.println("Enter password again: ");   
-//        passwordCheck = input.nextLine();
-//    while(!password.equals(passwordCheck))                      //PASSWORD CHECK
-//    {
-//    System.out.println("Passwords are not matching, please enter them again: ");
-//        password = input.nextLine();
-//    System.out.println("Enter password again: ");
-//        passwordCheck = input.nextLine();
-//    }
-//    System.out.println("Enter your first name: ");              //NAME
-//        firstName = input.nextLine();
-//    System.out.println("Enter your last name: ");
-//        lastName = input.nextLine();
-//    System.out.println("Enter your Corporation's Name: ");      //CORPORATION NAME
-//       corporationName = input.nextLine();
-//    registrationDate=formatter.format(new Date(System.currentTimeMillis()));    //REGISTRATION DATE 
-//         return new BusinessManager(username,password,firstName,lastName,corporationName,email,registrationDate);
-        
+    public Courier Registration(String __username) {        
        return new Courier(); 
     }
 
@@ -120,5 +138,20 @@ public class Courier implements Users{
 
     public void setSalary(int salary) {
         this.salary = salary;
+    }
+    
+        public int getCourierID() {
+        return courierID;
+    }
+
+    public void setCourierID(int courierID) {
+        this.courierID = courierID;
+    }
+        public String getWorkingHours() {
+        return workingHours;
+    }
+
+    public void setWorkingHours(String workingHours) {
+        this.workingHours = workingHours;
     }
 }

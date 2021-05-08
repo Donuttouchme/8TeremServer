@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Scanner ;
 import javafx.util.Pair;
 import static pkg8terem.Main.objectOutputStream;
 import static pkg8terem.Main.objectInputStream;
