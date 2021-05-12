@@ -7,6 +7,8 @@ package pkg8terem;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import javafx.util.Pair;
 import pkg8terem.Main.*;
@@ -81,7 +83,7 @@ public class Courier implements Users, Serializable{
         Main.objectOutputStream.flush();
         Main.objectOutputStream.reset();
     }
-    
+        
     @Override
     public Courier Registration(String __username) {        
        return new Courier(); 

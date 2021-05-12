@@ -31,8 +31,12 @@ public class Order implements Serializable{
     private int mealID;
     private String mealName;
     private int quantity;
-    private Map<Meal, Integer> mealsOrdered= new HashMap<Meal,Integer>();
+    private Map<Meal, Integer> mealsOrdered;
     private int restaurantID;
+    private String restaurantName;
+    private String guestAddress;
+    private String guestName;
+    private String guestPNumber;
     private Timestamp orderDate;
     private Timestamp estimatedDeliveryDate;
     private int paymentMethod;  
@@ -41,12 +45,24 @@ public class Order implements Serializable{
     
     public Order()
     {
+        this.mealsOrdered = new HashMap<>();
+    }
+    
+    public Order(int _batchID,String _restaurantName, String _guestAddress,String _guestName, String _guestPNumber)
+    {
+        this.mealsOrdered = new HashMap<>();
+        this.batchID=_batchID;
+        this.restaurantName=_restaurantName;
+        this.guestAddress=_guestAddress;
+        this.guestName=_guestName;
+        this.guestPNumber=_guestPNumber;
     }
     
     public Order(int _orderID,int _batchID,int _courierID,int _guestID, int _subsum, int _foodID, String _foodName,
             int _quantity, int _restaurantID, Timestamp _orderTime, Timestamp _estimatedDeliveryTime,
             int _paymentMethod, int _orderStatus,Timestamp _orderDoneTime)
     {
+        this.mealsOrdered = new HashMap<>();
         this.orderID=_orderID;
         this.batchID=_batchID;
         this.courierID=_courierID;
@@ -66,6 +82,7 @@ public class Order implements Serializable{
     
     public Order(int _restaurantID,int _guestID, Map<Meal,Integer>_orderMap, int _paymentMethod)
     {
+        this.mealsOrdered = new HashMap<>();
         this.restaurantID = _restaurantID;
         this.guestID = _guestID;
         this.mealsOrdered=_orderMap;
@@ -79,6 +96,16 @@ public class Order implements Serializable{
         Main.objectOutputStream.writeObject(Main.datas);
         Main.objectOutputStream.flush();
         Main.objectOutputStream.reset();
+    }
+    
+    public void setDeliveryStatusToDelivered(Order order) throws IOException
+    {
+        order.setOrderStatus(3);
+        Main.datas=new Pair<>(order,1);
+        Main.objectOutputStream.writeObject(Main.datas);
+        Main.objectOutputStream.flush();
+        Main.objectOutputStream.reset();
+        
     }
     
     public void underDelivery(Order order) throws IOException
@@ -214,6 +241,38 @@ public class Order implements Serializable{
 
     public void setMealName(String mealName) {
         this.mealName = mealName;
+    }
+    
+    public String getRestaurantName() {
+        return restaurantName;
+    }
+
+    public void setRestaurantName(String restaurantName) {
+        this.restaurantName = restaurantName;
+    }
+
+    public String getGuestAddress() {
+        return guestAddress;
+    }
+
+    public void setGuestAddress(String guestAddress) {
+        this.guestAddress = guestAddress;
+    }
+
+    public String getGuestName() {
+        return guestName;
+    }
+
+    public void setGuestName(String guestName) {
+        this.guestName = guestName;
+    }
+
+    public String getGuestPNumber() {
+        return guestPNumber;
+    }
+
+    public void setGuestPNumber(String guestPNumber) {
+        this.guestPNumber = guestPNumber;
     }
     
 }

@@ -111,7 +111,7 @@ public class Main implements Serializable{
                 }
                 if(keyvalue==4){
                     // ez valamiért ki volt kommentezve...
-                    Courier match = CheckLoginCourier((Pair)pairObj.getKey());
+                    Pair<List<Order>,Courier> match = CheckLoginCourier((Pair)pairObj.getKey());
                     objectOutputStream.writeObject(match);
                     objectOutputStream.flush();
                     objectOutputStream.reset();
@@ -183,7 +183,11 @@ public class Main implements Serializable{
                         objectOutputStream.reset();
                     }
                     if(keyvalue==3){
-                        deleteDiscount((Discount)pairObj.getKey());
+                        List<Discount> list=deleteDiscount((Discount)pairObj.getKey());
+                        System.out.println("discount delete kuldese elott: +");
+                        objectOutputStream.writeObject(list);
+                        objectOutputStream.flush();
+                        objectOutputStream.reset();
                     }
                 }
         }
@@ -248,8 +252,11 @@ public class Main implements Serializable{
             return g;
     }
     
-    static Courier CheckLoginCourier(Pair p){
+    static Pair<List<Order>,Courier> CheckLoginCourier(Pair p){
         Courier c = new Courier();
+        List<Order> orders= new ArrayList<>();
+        Pair<ArrayList<Order>,Courier> pair;
+        
        try {
                 Statement stmt=con.createStatement();
                 
@@ -257,12 +264,19 @@ public class Main implements Serializable{
                 if (rs.next()){
                     c = new Courier(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6),rs.getString(7),rs.getInt(8));
                 }   
+                
+                rs = stmt.executeQuery("sselect o.batchID, r.restaurantName, g.guestAddress, concat(g.firstName,\" \",g.lastName) as Name, g.phoneNumber from orders as o\n" +
+"join Restaurant as r on r.restaurantID=o.restaurantID\n" +
+"join Guest as g on g.guestID=o.guestID");
+                while (rs.next()){
+                    orders.add(new Order(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5)));
+                }   
             }
             catch (SQLException ex) {
                 //return false;
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
-       return c;
+       return new Pair<List<Order>,Courier>(orders,c);
     }
     
     //------------------------INSERTÁLÁSOK!!
@@ -368,15 +382,16 @@ public class Main implements Serializable{
         
     }
     
-    static void deleteDiscount(Discount d){
+    static List<Discount> deleteDiscount(Discount d){
         try {
-            System.out.println("delete discount ");
+            System.out.println("delete discount :" + d.getDiscountID());
+            
             PreparedStatement stmt = con.prepareStatement("DELETE FROM Discounts WHERE discountID = "+ d.getDiscountID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        return DiscountQuery(d.getRestaurantID());
     }
     
     
@@ -573,7 +588,6 @@ public class Main implements Serializable{
             rs=stmt.executeQuery("select * from Discounts where restaurantID = "+restaurantID);
             while(rs.next()){
             list.add(new Discount(rs.getInt(1),rs.getInt(2),rs.getInt(4),rs.getInt(5)));
-                System.out.println("discountquery test: " + rs.getInt(2));
             }
         } catch (SQLException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
