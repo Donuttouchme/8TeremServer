@@ -52,17 +52,6 @@ public class Restaurant implements Serializable{
     
     public void addMealToSpecifiedMenu(int category, Meal meal) throws IOException
     {
-        List<Meal> eloetelek=new ArrayList<Meal>();
-        List<Meal> foetelek=new ArrayList<Meal>();
-        List<Meal> desszertek=new ArrayList<Meal>();
-        List<Meal> italok=new ArrayList<Meal>();
-        if(menus.size()==0)
-        {
-            menus.add(new Menu(0,restaurantID,eloetelek));
-            menus.add(new Menu(1,restaurantID,foetelek));
-            menus.add(new Menu(2,restaurantID,desszertek));
-            menus.add(new Menu(3,restaurantID,italok));
-        }
         menus.get(category).addMealToMenu(meal);
        
     }

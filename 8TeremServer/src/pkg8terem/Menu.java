@@ -51,6 +51,8 @@ public class Menu implements Serializable{
             datas = new Pair<>(new Pair<>(meal,0),1);
             meals.add(meal);
             objectOutputStream.writeObject(datas);
+            objectOutputStream.flush();
+            objectOutputStream.reset();
         }
      
      public void listMenu()

@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner ;
@@ -100,11 +101,24 @@ public class BusinessManager implements Users, Serializable{
     void RestaurantRegistration(String restaurantName,String address,String openHours) throws IOException
     {
             datas = new Pair<>((new Restaurant(managedRestaurant.getRestaurantId(),restaurantName, address, openHours, managerID)),1);
-            m.objectOutputStream.writeObject(datas);
+            Main.objectOutputStream.writeObject(datas);
+            Main.objectOutputStream.flush();
+            Main.objectOutputStream.reset();
     }
     
         void addMealToMenu(String mealName, int mealPrice,String mealIngredients,String mealAllergens, int category) throws IOException
     {
+        if(managedRestaurant.getMenu().size()==0)
+        {
+            List<Meal> eloetelek=new ArrayList<Meal>();
+            List<Meal> foetelek=new ArrayList<Meal>();
+            List<Meal> desszertek=new ArrayList<Meal>();
+            List<Meal> italok=new ArrayList<Meal>();
+            managedRestaurant.getMenu().add(new Menu(0,managedRestaurant.getRestaurantID(),eloetelek));
+            managedRestaurant.getMenu().add(new Menu(1,managedRestaurant.getRestaurantID(),foetelek));
+            managedRestaurant.getMenu().add(new Menu(2,managedRestaurant.getRestaurantID(),desszertek));
+            managedRestaurant.getMenu().add(new Menu(3,managedRestaurant.getRestaurantID(),italok));
+        }
         managedRestaurant.addMealToSpecifiedMenu(category, new Meal(mealName,mealPrice,mealIngredients,mealAllergens, category,managedRestaurant.getMenu().get(category).getId()));
     }
     

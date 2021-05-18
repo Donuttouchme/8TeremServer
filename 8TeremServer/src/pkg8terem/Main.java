@@ -104,17 +104,28 @@ public class Main implements Serializable{
                     }
                     Pair<Guest,List<Restaurant>> p = new Pair<>(g,l);
                     System.out.println("guest objekt kuldes elott: nev: " + p.getKey().getFirstName() + " restaurant id: "+p.getValue().get(0).getRestaurantID());
-                    System.out.println("elso kaja nev: "+p.getValue().get(0).getMenu().get(0).getMeals().get(0).getName());
+                    //System.out.println("elso kaja nev: "+p.getValue().get(0).getMenu().get(0).getMeals().get(0).getName());
                     objectOutputStream.writeObject(p);
                     objectOutputStream.flush();
                     objectOutputStream.reset();
                 }
                 if(keyvalue==4){
-                    // ez valamiért ki volt kommentezve...
+                    int [] sajt = new int[1];
                     Pair<List<Order>,Courier> match = CheckLoginCourier((Pair)pairObj.getKey());
+                    if (match.getValue().getFirstName()==null){
+                        System.out.println(sajt[-1]);
+                    }
+                    
                     objectOutputStream.writeObject(match);
                     objectOutputStream.flush();
                     objectOutputStream.reset();
+                }
+                if(keyvalue==5){
+                List<Order> o = updateOrderCourier((Pair)pairObj.getKey());
+                    objectOutputStream.writeObject(o);
+                    objectOutputStream.flush();
+                    objectOutputStream.reset();
+                
                 }
             }
         // -----------------INSERTÁLÁS IFEK ÉS GET-IDK!
@@ -152,6 +163,13 @@ public class Main implements Serializable{
                         objectOutputStream.flush();
                         objectOutputStream.reset();
                     }
+                      if (keyvalue==3){
+                        Restaurant r = (Restaurant) pairObj.getKey();
+                        List <Menu> m = MenuQuery(r);
+                        objectOutputStream.writeObject(m);
+                        objectOutputStream.flush();
+                        objectOutputStream.reset();
+                      }
                 }
                 if(pairObj.getKey().getClass().getSimpleName().equals("Courier")){
                     if(keyvalue==1){
@@ -171,6 +189,9 @@ public class Main implements Serializable{
                         objectOutputStream.writeObject(l);
                         objectOutputStream.flush();
                         objectOutputStream.reset();
+                    }
+                    if(keyvalue==2){
+                    updateOrderEstimatedTime((Order) pairObj.getKey());
                     }
                 }
                 //DISCOUNT
@@ -265,12 +286,12 @@ public class Main implements Serializable{
                     c = new Courier(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6),rs.getString(7),rs.getInt(8));
                 }   
                 
-                rs = stmt.executeQuery("sselect o.batchID, r.restaurantName, g.guestAddress, concat(g.firstName,\" \",g.lastName) as Name, g.phoneNumber from orders as o\n" +
+                rs = stmt.executeQuery("select o.batchID, r.restaurantName, g.guestAddress, concat(g.firstName,\" \",g.lastName) as Name, g.phoneNumber,o.courierID,o.paymentmethod,o.orderstatus,sum(o.subsum),o.restaurantID from orders as o\n" +
 "join Restaurant as r on r.restaurantID=o.restaurantID\n" +
-"join Guest as g on g.guestID=o.guestID");
+"join Guest as g on g.guestID=o.guestID group by o.batchID");
                 while (rs.next()){
-                    orders.add(new Order(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5)));
-                }   
+                    orders.add(new Order(rs.getInt(1),rs.getInt(6),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getInt(9),rs.getInt(7),rs.getInt(8),rs.getInt(10)));
+                }   //_batchID,int _courierID,String _restaurantName, String _guestAddress,String _guestName, String _guestPNumber,int _sum, int _paymentMethod, int _orderStatus
             }
             catch (SQLException ex) {
                 //return false;
@@ -345,10 +366,12 @@ public class Main implements Serializable{
         ResultSet rs3=null;
         Statement stmt3=con.createStatement();
         System.out.println("eljut ide is");
+        System.out.println("order status: "+orders.getOrderStatus());
         if (orders.getOrderStatus()==3){
+            System.out.println("updateli 3-asraaa");
             java.util.Date date = new java.util.Date();
             java.sql.Timestamp time = new java.sql.Timestamp(date.getTime());
-            PreparedStatement stmt = con.prepareStatement("UPDATE Orders SET orderstatus = "+orders.getOrderStatus()+", orderdonetime="+time+" WHERE batchID="+orders.getBatchID());
+            PreparedStatement stmt = con.prepareStatement("UPDATE Orders SET orderstatus = "+orders.getOrderStatus()+", orderdonetime='"+time+"' WHERE batchID="+orders.getBatchID());
             stmt.executeUpdate();
         }
         else{
@@ -357,18 +380,78 @@ public class Main implements Serializable{
             System.out.println("eljut ide issss");
         }
         
-                rs3=stmt3.executeQuery("select o.*,f.name from Orders as o join Restaurant as r on r.restaurantID=o.restaurantID join Food as f on f.foodID=o.foodID join BusinessManager as b on b.managerID=r.managerID where r.restaurantID="+orders.getRestaurantID());
+        System.out.println("restaurant id:"+orders.getRestaurantID());
+                rs3 = stmt3.executeQuery("select o.batchID, r.restaurantName, g.guestAddress, concat(g.firstName,\" \",g.lastName) as Name, g.phoneNumber,o.courierID,o.paymentmethod,o.orderstatus,sum(o.subsum),o.restaurantID from orders as o\n" +
+"join Restaurant as r on r.restaurantID=o.restaurantID\n" +
+"join Guest as g on g.guestID=o.guestID group by o.batchID");
+             
         while (rs3.next()){
             //System.out.println(rs3.getInt(1)+rs3.getInt(2)+rs3.getInt(3)+rs3.getInt(4)+rs3.getInt(6)+rs3.getInt(7)+rs3.getString(15)+rs3.getInt(8)+rs3.getInt(9)+rs3.getTimestamp(10)+rs3.getTimestamp(11)+rs3.getInt(12)+rs3.getInt(13)+rs3.getTimestamp(14));
             //System.out.println(rs3.getInt(1)+" | "+rs3.getInt(2)+" | "+rs3.getInt(3)+" | "+rs3.getInt(4)+" | "+rs3.getInt(6)+" | "+rs3.getInt(7)+" | "+rs3.getString(15)+" | "+rs3.getInt(8)+" | "+rs3.getInt(9)+" | "+rs3.getTimestamp(10)+" | "+rs3.getTimestamp(11)+" | "+rs3.getInt(12)+" | "+rs3.getInt(13)+" | "+rs3.getTimestamp(14));
-            lista.add(new Order(rs3.getInt(1),rs3.getInt(2),rs3.getInt(3),rs3.getInt(4),rs3.getInt(6),rs3.getInt(7),rs3.getString(15),rs3.getInt(8),rs3.getInt(9),rs3.getTimestamp(10),rs3.getTimestamp(11),rs3.getInt(12),rs3.getInt(13),rs3.getTimestamp(14)));   
+           lista.add(new Order(rs3.getInt(1),rs3.getInt(6),rs3.getString(2),rs3.getString(3),rs3.getString(4),rs3.getString(5),rs3.getInt(9),rs3.getInt(7),rs3.getInt(8),rs3.getInt(10)));
             System.out.println("eljut ide is de nagyon");
+            System.out.println("rs.");
         }
         } catch (SQLException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     System.out.println("returnolás előtt");
     return lista;
+    }
+    
+    static List<Order> updateOrderCourier(Pair p){
+            ResultSet rs=null;
+            ResultSet rs2=null;  
+            int futarid = (int) p.getKey();
+            int batchid= (int) p.getValue();
+            List<Order> orders = new ArrayList<>();
+        try {
+            
+            PreparedStatement stmt = con.prepareStatement("UPDATE Orders SET courierID="+futarid+" WHERE batchID="+batchid);
+            stmt.executeUpdate();
+            
+            Statement stmt2 = con.createStatement();
+             rs2 = stmt2.executeQuery("select o.batchID, r.restaurantName, g.guestAddress, concat(g.firstName,\" \",g.lastName) as Name, g.phoneNumber,o.courierID,o.paymentmethod,o.orderstatus,sum(o.subsum),o.restaurantID from orders as o\n" +
+"join Restaurant as r on r.restaurantID=o.restaurantID\n" +
+"join Guest as g on g.guestID=o.guestID group by o.batchID");
+             
+                while (rs2.next()){
+                    orders.add(new Order(rs2.getInt(1),rs2.getInt(6),rs2.getString(2),rs2.getString(3),rs2.getString(4),rs2.getString(5),rs2.getInt(9),rs2.getInt(7),rs2.getInt(8),rs2.getInt(10)));
+        }} catch (SQLException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return orders;
+    }
+    
+    
+    static void updateOrderEstimatedTime(Order o){
+        ResultSet rs = null;
+        System.out.println("eljut ideeeeeeeeee?????");
+        try {
+            Statement stmt = con.createStatement();
+            /*
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new java.util.Date());
+            calendar.add(Calendar.MINUTE, rand_int1);
+            Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
+            */
+            Calendar calendar = Calendar.getInstance();
+            Timestamp timestamp =null;
+            
+            rs = stmt.executeQuery("select o.ordertime from orders as o where batchID="+o.getBatchID());
+            
+            if(rs.next()){
+            calendar.setTime(rs.getTime(1));
+            calendar.add(Calendar.MINUTE,o.getEstimated_time());
+            timestamp = new Timestamp(calendar.getTimeInMillis());
+            }
+            PreparedStatement stmt2 = con.prepareStatement("UPDATE Orders set estdeliverytime = '"+timestamp+"' WHERE batchID = "+o.getBatchID());
+            stmt2.executeUpdate();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
     
     static void updateCourierAv(Courier c){
@@ -417,6 +500,7 @@ public class Main implements Serializable{
     
     static void insertMenu(int RestaurantID){
     try {
+        System.out.println("restaurantID: " + RestaurantID);
         PreparedStatement stmt = con.prepareStatement("INSERT INTO Menu(restaurantID,categoryID)VALUES(?,?),(?,?),(?,?),(?,?)");
         stmt.setInt(1,RestaurantID);
         stmt.setInt(3,RestaurantID);
@@ -437,7 +521,8 @@ public class Main implements Serializable{
     try {
         Meal c = (Meal)p.getKey();
         int id = (int) p.getValue();
-        //System.out.println("Kaja beinzertálás előtt");
+        System.out.println("Kaja beinzertálás előtt");
+        System.out.println("menuid: " + c.getMenuID());
         PreparedStatement stmt = con.prepareStatement("INSERT INTO Food(name,ingredients,allergenes,price,menuID)VALUES(?,?,?,?,?)");
         stmt.setString(1, c.getName());
         stmt.setString(2, c.getIngredients());
@@ -512,6 +597,7 @@ public class Main implements Serializable{
         static List<Discount> insertDiscount(Discount d){
         try {
             System.out.println("insert discount");
+            System.out.println("kaja id:"+d.getFoodID());
         PreparedStatement stmt = con.prepareStatement("INSERT INTO Discounts(discount_percentage,foodID,restaurantID)VALUES(?,?,?)");
         stmt.setInt(1,d.getDiscountPercentage());
         stmt.setInt(2,d.getFoodID());
